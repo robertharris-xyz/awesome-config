@@ -233,7 +233,7 @@ globalkeys = my_table.join(
     { description = "Run dmenu", group = "Applications"}),
 
     -- Play Video
-    awful.key({ modkey }, "v", function() awful.spawn(terminal.." -e /home/user/scripts/play.sh") end,
+    awful.key({ modkey }, "v", function() awful.spawn(terminal.." -e /home/user/misc-scripts/play.sh") end,
     { description = "Play Video", group = "Applications"}),
     
     -- Launch Firefox
@@ -549,4 +549,4 @@ end
 
 awful.spawn.with_shell("compton")
 awful.spawn.with_shell("nitrogen --restore")
---awful.spawn(terminal.." -e /home/user/scripts/play.sh")
+--awful.spawn(terminal.." -e /home/user/misc-scripts/play.sh")
