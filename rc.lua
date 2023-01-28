@@ -26,7 +26,7 @@ local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
-                     title = "Oops, there were errors during startup!",
+                     title = "ERROR!",
                      text = awesome.startup_errors })
 end
 
@@ -39,7 +39,7 @@ do
         in_error = true
 
         naughty.notify({ preset = naughty.config.presets.critical,
-                         title = "Oops, an error happened!",
+                         title = "ERROR!",
                          text = tostring(err) })
         in_error = false
     end)
@@ -65,20 +65,18 @@ beautiful.init(theme_path)
 local modkey      = "Mod4"
 local altkey      = "Mod1"
 local ctrlkey     = "Control"
---local terminal    = "alacritty"
 local terminal    = "terminator"
---local browser     = "qutebrowser"
 local browser     = "firefox"
 local editor      = os.getenv("EDITOR") or "vim"
-local emacs       = "emacsclient -c -a 'emacs' "
-local mediaplayer = "mpv"
-local soundplayer = "ffplay -nodisp -autoexit " -- The program that will play system sounds
+local mediaplayer = "vlc"
 
 -- awesome variables
 awful.util.terminal = terminal
 --awful.util.tagnames = {  " ", " ", " ", " ", " ", " ", " ", " ", " ", " "  }
 awful.util.tagnames = { " MEDIA ", " WEB " }
 awful.layout.suit.tile.left.mirror = true
+
+-- ORDER MATTERS!
 awful.layout.layouts = {
     awful.layout.suit.tile,
     awful.layout.suit.floating,
@@ -183,12 +181,6 @@ awful.util.mymainmenu = freedesktop.menu.build({
 })
 --menubar.utils.terminal = terminal -- Set the Menubar terminal for applications that require it
 
-local soundDir = "/opt/dtos-sounds/" -- The directory that has the sound files
-
-local startupSound  = soundDir .. "startup-01.mp3"
-local shutdownSound = soundDir .. "shutdown-01.mp3"
-local dmenuSound    = soundDir .. "menu-01.mp3"
-
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", function(s)
     -- Wallpaper
@@ -270,31 +262,6 @@ globalkeys = my_table.join(
           )
         end,
         {description = "followed by KEY", group = "Dmscripts"}
-        ),
-
-    -- Emacs (Super + e followed by KEY)
-    awful.key( {modkey}, "e", function()
-      local grabber
-      grabber =
-        awful.keygrabber.run(
-          function(_, key, event)
-            if event == "release" then return end
-
-            if     key == "e" then awful.spawn.with_shell(emacs .. "--eval '(dashboard-refresh-buffer)'")
-            elseif key == "a" then awful.spawn.with_shell(emacs .. "--eval '(emms)' --eval '(emms-play-directory-tree \"~/Music/\")'")
-            elseif key == "b" then awful.spawn.with_shell(emacs .. "--eval '(ibuffer)'")
-            elseif key == "d" then awful.spawn.with_shell(emacs .. "--eval '(dired nil)'")
-            elseif key == "i" then awful.spawn.with_shell(emacs .. "--eval '(erc)'")
-            elseif key == "n" then awful.spawn.with_shell(emacs .. "--eval '(elfeed)'")
-            elseif key == "s" then awful.spawn.with_shell(emacs .. "--eval '(eshell)'")
-            elseif key == "v" then awful.spawn.with_shell(emacs .. "--eval '(+vterm/here nil)'")
-            elseif key == "w" then awful.spawn.with_shell(emacs .. "--eval '(doom/window-maximize-buffer(eww \"distro.tube\"))'")
-            end
-            awful.keygrabber.stop(grabber)
-            end
-          )
-        end,
-        {description = "followed by KEY", group = "Emacs"}
         ),
 
     -- Tag browsing with modkey
@@ -423,41 +390,6 @@ globalkeys = my_table.join(
         {description = "show filesystem", group = "widgets"}),
     awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
         {description = "show weather", group = "widgets"}),
-
-    -- Brightness
-    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
-        {description = "+10%", group = "hotkeys"}),
-    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
-        {description = "-10%", group = "hotkeys"}),
-
-    -- ALSA volume control
-    --awful.key({ ctrlkey }, "Up",
-    awful.key({ }, "XF86AudioRaiseVolume",
-        function ()
-            os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
-            beautiful.volume.update()
-        end),
-    --awful.key({ ctrlkey }, "Down",
-    awful.key({ }, "XF86AudioLowerVolume",
-        function ()
-            os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
-            beautiful.volume.update()
-        end),
-    awful.key({ }, "XF86AudioMute",
-        function ()
-            os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
-            beautiful.volume.update()
-        end),
-    awful.key({ ctrlkey, "Shift" }, "m",
-        function ()
-            os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end),
-    awful.key({ ctrlkey, "Shift" }, "0",
-        function ()
-            os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end),
 
     -- Copy primary to clipboard (terminals to gtk)
     awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
@@ -629,29 +561,13 @@ awful.rules.rules = {
     -- Set applications to be maximized at startup.
     -- find class or role via xprop command
 
-    { rule = { class = "Gimp*", role = "gimp-image-window" },
-          properties = { maximized = true } },
-
-    { rule = { class = "inkscape" },
-          properties = { maximized = true } },
-
     { rule = { class = mediaplayer },
           properties = { maximized = true } },
 
     { rule = { class = "Vlc" },
           properties = { maximized = true } },
 
-    { rule = { class = "VirtualBox Manager" },
-          properties = { maximized = true } },
-
-    { rule = { class = "VirtualBox Machine" },
-          properties = { maximized = true } },
-
-    { rule = { class = "Xfce4-settings-manager" },
-          properties = { floating = false } },
-
-
-
+    
     -- Floating clients.
     { rule_any = {
         instance = {
@@ -771,7 +687,6 @@ client.connect_signal("focus", border_adjust)
 client.connect_signal("property::maximized", border_adjust)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
-awful.spawn.with_shell(soundplayer .. startupSound)
 awful.spawn.with_shell("lxsession")
 awful.spawn.with_shell("picom")
 awful.spawn.with_shell("nm-applet")
