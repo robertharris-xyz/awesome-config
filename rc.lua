@@ -24,6 +24,8 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
                       require("awful.hotkeys_popup.keys")
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
 
+local xrandr = require("xrandr")
+
 if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
                      title = "ERROR!",
@@ -240,6 +242,13 @@ globalkeys = my_table.join(
     awful.key({ modkey }, "f", function() awful.util.spawn("firefox") end,
     { description = "Launch Firefox", group = "Applications"}),
 
+    -- Launch sound mixer 
+    awful.key({ modkey }, "g", function() awful.spawn(terminal.."alsamixer -c 0") end,
+    { description = "alsamixer -c 0", group = "Applications"}),
+
+    -- Launch display manager
+    awful.key({ modkey }, "d", function() xrandr.xrandr() end,
+    { description = "Launch display manager", group = "Applications" }),
 
     awful.key({ modkey }, "n", function() awful.util.spawn("firefox https://netflix.com") end,
     { description = "Launch Netflix", group = "Applications"}),
@@ -285,10 +294,10 @@ globalkeys = my_table.join(
         {description = "add new tag", group = "tag"}),
     awful.key({ modkey, ctrlkey }, "r", function () lain.util.rename_tag() end,
         {description = "rename tag", group = "tag"}),
-    awful.key({ modkey, "Shift" }, "Left", function () lain.util.move_tag(-1) end,
-        {description = "move tag to the left", group = "tag"}),
-    awful.key({ modkey, "Shift" }, "Right", function () lain.util.move_tag(1) end,
-        {description = "move tag to the right", group = "tag"}),
+    --awful.key({ modkey, "Shift" }, "Left", function () lain.util.move_tag(-1) end,
+    --    {description = "move tag to the left", group = "tag"}),
+    --awful.key({ modkey, "Shift" }, "Right", function () lain.util.move_tag(1) end,
+    --    {description = "move tag to the right", group = "tag"}),
     awful.key({ modkey, "Shift" }, "d", function () lain.util.delete_tag() end,
         {description = "delete tag", group = "tag"}),
 
@@ -323,7 +332,9 @@ clientkeys = my_table.join(
     awful.key({ modkey, "Shift" }, "c", function (c) c:kill() end,
     	{description = "Close application", group = "Applications"}),
     awful.key({ altkey }, "F4", function (c) c:kill() end,
-    	{description = "Close application", group = "Applications"})
+    	{description = "Close application", group = "Applications"}),
+    awful.key({ modkey, "Shift" }, "Right", function (c) c:move_to_screen() end,
+    	{description = "Move to screen", group = "client"})
 )
 
 -- Bind all key numbers to tags.
@@ -444,10 +455,10 @@ awful.rules.rules = {
     -- find class or role via xprop command
 
     { rule = { class = mediaplayer },
-          properties = { maximized = true } },
+          properties = { maximized = true, screen = 2 } },
 
     { rule = { class = "Vlc" },
-          properties = { maximized = true } },
+          properties = { maximized = true, screen = 2 } },
 
     
     -- Floating clients.
