@@ -156,12 +156,13 @@ lain.layout.cascade.tile.ncol          = 2
 beautiful.init(string.format(gears.filesystem.get_configuration_dir() .. "/themes/%s/theme.lua", chosen_theme))
 
 local myawesomemenu = {
-    { "hotkeys", function() return false, hotkeys_popup.show_help end },
-    { "manual", terminal .. " -e 'man awesome'" },
-    { "edit config", "emacsclient -c -a emacs ~/.config/awesome/rc.lua" },
-    { "arandr", "arandr" },
-    { "restart", awesome.restart },
+    { "Hotkeys", function() return false, hotkeys_popup.show_help end },
+    { "Manual", terminal .. " -e 'man awesome'" },
+    { "Edit config", terminal .. "-e 'vim ~/.config/awesome/rc.lua'" },
+    { "Restart Awesome", awesome.restart },
 }
+
+--TODO: Add media menu?
 
 awful.util.mymainmenu = freedesktop.menu.build({
     icon_size = beautiful.menu_height or 16,
@@ -175,7 +176,7 @@ awful.util.mymainmenu = freedesktop.menu.build({
         { "Log out", function() awesome.quit() end },
         { "Sleep", "systemctl suspend" },
         { "Restart", "systemctl reboot" },
-        { "Exit", "systemctl poweroff" },
+        { "Shutdown", "systemctl poweroff" },
         -- other triads can be put here
     }
 })
